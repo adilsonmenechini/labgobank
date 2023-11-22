@@ -74,7 +74,7 @@ func (a *Account) Withdraw(amount float64) error {
 	defer a.Mu.Unlock()
 
 	if amount >= 0 && amount > a.Balance {
-		return fmt.Errorf("%d", ErrWithdrawalInsufficient)
+		return fmt.Errorf("%s", ErrWithdrawalInsufficient)
 	}
 
 	a.Balance -= amount
@@ -101,11 +101,11 @@ func (a *Account) Payment(amount float64) error {
 			}
 
 		} else {
-			return fmt.Errorf("%d", ErrPaymentInsufficient)
+			return fmt.Errorf("%s", ErrPaymentInsufficient)
 		}
 
 	} else {
-		return fmt.Errorf("%d", ErrPaymentInsufficient)
+		return fmt.Errorf("%s", ErrPaymentInsufficient)
 	}
 }
 
@@ -130,7 +130,7 @@ func (a *Account) PaymentLimit(amount float64) error {
 		}
 
 	} else {
-		return fmt.Errorf("%d", ErrPaymentInsufficient)
+		return fmt.Errorf("%s", ErrPaymentInsufficient)
 	}
 }
 
@@ -157,7 +157,7 @@ func (a *Account) Transfer(toAcc *Account, amount float64) (*Account, error) {
 			toAcc.UpdatedAt = time.Now().UTC()
 			return toAcc, nil
 		} else {
-			return a, fmt.Errorf("%d", ErrTransferInsufficient)
+			return a, fmt.Errorf("%s", ErrTransferInsufficient)
 		}
 	}
 	return toAcc, nil

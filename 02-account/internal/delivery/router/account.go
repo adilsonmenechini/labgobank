@@ -24,6 +24,25 @@ func NewAccountRouter(hdlr handler.AccountHandler) *AccountRouter {
 	}
 }
 
+func jwtMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, err := utils.GetTokenAuthorization(r)
+		if err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"status":     "error",
+				"statusCode": http.StatusUnauthorized,
+				"message":    "Unauthorized",
+			})
+
+			return
+		}
+		next.ServeHTTP(w, r)
+
+	})
+}
+
 func (ra *AccountRouter) account() http.Handler {
 	r := mux.NewRouter()
 	c := r.PathPrefix("/api/account").Subrouter()
@@ -40,6 +59,7 @@ func (ra *AccountRouter) account() http.Handler {
 	a.HandleFunc("/transfer", ra.hdl.TransferHandler).Methods("POST")
 	a.HandleFunc("/payment", ra.hdl.PaymentHandler).Methods("POST")
 	a.HandleFunc("/balance", ra.hdl.PaymentLimitHandler).Methods("POST")
+	a.Use(jwtMiddleware)
 
 	return r
 }

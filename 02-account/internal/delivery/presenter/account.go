@@ -26,6 +26,12 @@ type OrderAccountRequest struct {
 	Amount        float64 `json:"amount" valid:"notnull"`
 }
 
+type TransferAccountRequest struct {
+	FromAccountNumber string  `json:"from_account" valid:"notnull" `
+	ToAccountNumber   string  `json:"to_account" valid:"notnull" `
+	Amount            float64 `json:"amount" valid:"notnull"`
+}
+
 type CreateAccountResponse struct {
 	AccountNumber string    `json:"account_number"`
 	AccountType   string    `json:"account_type"`

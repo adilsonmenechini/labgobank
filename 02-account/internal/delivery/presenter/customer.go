@@ -29,6 +29,10 @@ type CustomerResponse struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type CustomersToken struct {
+	Token string `json:"token" valid:"notnull,email"`
+}
+
 type CustomerPresenter struct {
 	logger *utils.Logger
 }

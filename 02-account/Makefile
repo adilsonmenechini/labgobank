@@ -1,7 +1,9 @@
 .PHONY: help start tidy db  clean 
 
 LDEPLOY="deploy"
+migrationDir=migration
 include deploy/.env
+export DB_HOST=$(shell docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' db_psql)
 
 help:
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
@@ -23,6 +25,7 @@ tidy:
 ## Docker Compose
 ## ----------------
 ## make db - Docker-compose PostgreSQL
+	
 db:  
 	@docker compose -f ${LDEPLOY}/docker-compose.yaml up -d
 
@@ -38,19 +41,19 @@ clean:
 ## ----------------
 ## make migrate - Migrate Create
 migrate: 
-	migrate create -ext sql -dir migration/ -seq account
+	docker run --rm -v .\${migrationDir}:/migration migrate/migrate create -ext sql -dir migration/ -seq transaction
 
 ## make migrateUp - Migrate Up
 migrateUp: 
-	migrate -path migration/ -database "${DB_DRIVER}://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable"  -verbose up
+	 docker run --rm  -v .\${migrationDir}:/migrations --network bridge migrate/migrate -path=/migrations/ -database "${DB_DRIVER}://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable"  -verbose up
 
 ## make migrateDown - Migrate Down
 migrateDown: 
-	migrate -path migration/ -database "${DB_DRIVER}://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable"  -verbose down
+	 docker run --rm  -v .\${migrationDir}:/migrations migrate/migrate -path=/migrations/ -database "${DB_DRIVER}://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable"  -verbose down
 
 ## make migrateDrop - Migrate Drop
 migrateDrop: 
-	migrate -path migration/ -database "${DB_DRIVER}://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" -verbose drop -f
+	 docker run --rm  -v .\${migrationDir}:/migrations migrate/migrate -path=/migrations/ -database "${DB_DRIVER}://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" -verbose drop -f
 
 ##
 ## ----------------

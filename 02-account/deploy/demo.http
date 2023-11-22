@@ -1,0 +1,52 @@
+###
+@url=localhost:8000
+@customer=api/customer
+@account=api/account
+@email=adilson@gmail.com
+@pwd=Aqwe123@
+@contentType=application/json
+
+###
+POST http://{{url}}/{{customer}}/v1/signup
+Content-Type: {{contentType}}
+
+{
+  "name": "Adilson Menechini",
+  "email": "{{email}}",
+  "password": "{{pwd}}"
+}
+
+###
+# @name signin
+GET http://{{url}}/{{customer}}/v1/signin
+Content-Type: {{contentType}}
+
+{
+  "email": "{{email}}",
+  "password": "{{pwd}}"
+}
+
+@access_bearer={{signin.response.body.Authorization}}
+
+###
+
+POST http://{{url}}/{{account}}/v1/create
+Authorization: {{access_bearer}}
+Content-Type: {{contentType}}
+
+{
+  "account_type": "caixa",
+  "limit": 100
+}
+
+
+###
+
+POST http://{{url}}/{{account}}/v1/deposit
+Content-Type: {{contentType}}
+Authorization: {{access_bearer}}
+
+{
+  "account_number": "212086",
+  "amount": 111
+}

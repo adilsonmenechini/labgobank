@@ -77,13 +77,13 @@ func (hc *customerHandler) SigninHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	jwtg, err := utils.GenerateJWT(input.ID, input.Email)
+	jwtg, err := utils.GenerateJWT(input.ID, input.Name, input.Email)
 	if err != nil {
 		hc.rs.ResponseError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	utils.SetTokenAsCookie(w, jwtg)
+	utils.SetTokenAuthorization(w, jwtg)
 
 	hc.rs.ResponseSuccess(w, http.StatusOK, "login successful")
 
@@ -91,13 +91,12 @@ func (hc *customerHandler) SigninHandler(w http.ResponseWriter, r *http.Request)
 
 func (hc *customerHandler) AuthorizeCustomerHandler(w http.ResponseWriter, r *http.Request) {
 
-	tk, err := utils.GetTokenFromCookie(r)
+	tk, err := utils.GetTokenAuthorization(r)
 	if err != nil {
 		hc.rs.ResponseErrorToken(w, http.StatusUnauthorized, "invalid token")
 		return
 	}
 
-	utils.SetTokenAsCookie(w, tk.Email)
 	hc.rs.ResponseSuccess(w, http.StatusOK, "welcome "+tk.Email)
 
 }

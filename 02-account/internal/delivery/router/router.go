@@ -12,8 +12,10 @@ import (
 func Router(db *sql.DB) {
 
 	rcustomer := CustomerImpl(db)
+	raccount := AccountImpl(db)
 	r := mux.NewRouter()
-	//r.PathPrefix("/api/account/v1").Handler(accountRouter)
+
+	r.PathPrefix("/api/account/v1").Handler(raccount)
 	r.PathPrefix("/api/customer/v1").Handler(rcustomer)
 
 	// Crie o servidor HTTP usando o roteador principal

@@ -18,7 +18,6 @@ func NewResponsePresenter() *ResponsePresenter {
 }
 
 func (pa *ResponsePresenter) ResponseSuccess(w http.ResponseWriter, statusCode int, res string) {
-
 	pa.logger.Infof("statusCode: %d, message: %s", statusCode, res)
 
 	w.Header().Set("Content-Type", "application/json")
@@ -31,7 +30,6 @@ func (pa *ResponsePresenter) ResponseSuccess(w http.ResponseWriter, statusCode i
 }
 
 func (pa *ResponsePresenter) ResponseError(w http.ResponseWriter, statusCode int, res string) {
-	//pa.logger.Errorf("statusCode: %d, message: %s", statusCode, res)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)

@@ -13,7 +13,7 @@ type (
 		Create(ctx context.Context, req presenter.CreateAccountRequest) error
 		Deposit(ctx context.Context, req presenter.OrderAccountRequest) error
 		Withdraw(ctx context.Context, req presenter.OrderAccountRequest) error
-		Transfer(ctx context.Context, from presenter.OrderAccountRequest, to presenter.AccountNumberRequest) error
+		Transfer(ctx context.Context, req presenter.TransferAccountRequest) error
 		Payment(ctx context.Context, req presenter.OrderAccountRequest) error
 		PaymentLimit(ctx context.Context, req presenter.OrderAccountRequest) error
 		Delete(ctx context.Context, req presenter.AccountNumberRequest) error
@@ -57,18 +57,14 @@ func (auc *accountUseCase) FindByCustomer(ctx context.Context, req presenter.Acc
 }
 
 // Transfer implements AccountUseCase.
-func (auc *accountUseCase) Transfer(ctx context.Context, from presenter.OrderAccountRequest, to presenter.AccountNumberRequest) error {
-	if err := utils.ValidateStruct(from); err != nil {
+func (auc *accountUseCase) Transfer(ctx context.Context, req presenter.TransferAccountRequest) error {
+
+	if err := utils.ValidateStruct(req); err != nil {
 		auc.logger.Errorf("error validating request: %v", err)
 		return err
 	}
 
-	if err := utils.ValidateStruct(to); err != nil {
-		auc.logger.Errorf("error validating request: %v", err)
-		return err
-	}
-
-	if err := auc.repo.Transfer(ctx, from.Amount, from.AccountNumber, to.AccountNumber); err != nil {
+	if err := auc.repo.Transfer(ctx, req.Amount, req.FromAccountNumber, req.ToAccountNumber); err != nil {
 		auc.logger.Errorf("error depositing account: %v", err)
 		return err
 	}
